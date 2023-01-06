@@ -1,8 +1,10 @@
-const request = require("request");
+const axios = require("axios");
 const reviewModel = require("../models/reviewModel");
 const movieModel = require("../models/movieModel");
 const {isValidRequest,isValidValue} = require("../utils/validator");
 const API_KEY='231b38601ccd0b4ba999c87415f28a9c';
+const BASE_URL='https://api.themoviedb.org/3/search/movie';
+const POSTER_URL='https://image.tmdb.org/t/p/w500'
 
 //----------------------------------Create Review --------------------------------//
 
@@ -12,48 +14,49 @@ const createReview = async (req, res)=> {
     if (!isValidRequest(req.body)){
       return res.status(400).send({ Status:'Failed', Message:"Please fill the details" });
     }
-    const {review,rating,message,movie} = req.body;
-    
-    if(!review){
+    let {review,rating,message,movie} = req.body;
+    movie=movie.trim();
+
+    if(!isValidValue(review)){
       return res.status(400).send({ Status:'Failed', Message:"Review field can not be blank"});
     }
-    if(!rating){
-      return res.status(400).send({ Status:'Failed', Message:"Please enter movie rating"});
+    if(!rating || isNaN(rating)){
+      return res.status(400).send({ Status:'Failed', Message:"Please enter movie rating in Number"});
     }
     if(rating<=0 || rating>5){
       return res.status(400).send({ Status:'Failed', Message:"Rate from 1 to 5"});
     }
-    if(!movie){
+    if(!isValidValue(movie)){
       return res.status(400).send({ Status:'Failed', Message:"Please enter movie name"});
     }
+    
+    
+    let movieRecord = await movieModel.findOne({title:movie});
+    if(movieRecord){
+      req.body.movie = movieRecord._id;
+      let reviewData = await reviewModel.create(req.body);
+      return res.status(201).send({ Status: 'Success', 'User Review': reviewData, 
+          'Movie Details':movieRecord });
+    }
 
-    request(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${movie}`,
-      async (error, response, body) => {
-        if (error) {
-          res.status(404).send({ Status: 'Failed', message: error.message });
-        } 
-        else {
-          let data1 = JSON.parse(body);
-          let items = data1.results[0];
-          const title = items.title;
-          const poster = items.poster_path;
-          let description = items.overview;
+    let response=await axios.get(`${BASE_URL}?api_key=${API_KEY}&query=${movie}`)
+    if(response.data.results.length==0){
+      return res.status(404).send({ Status:'Failed', Message:"No record found" });
+    }
 
-          let movieData = await movieModel.create({
-            title,
-            poster,
-            description,
-          });
-         
-          req.body.movie = movieData._id;
 
-          let reviewData = await reviewModel.create(req.body);
+    const movie_record=response.data.results[0];
+    let {id,title,poster_path,overview,popularity,release_date} = movie_record;
+    const movie_id=id;
+    poster_path = POSTER_URL+movie_record.poster_path;
+    let movie_obj = {movie_id,title,poster_path,overview,popularity,release_date}
 
-          return res.status(201).send({ Status: 'Success', 'User Review': reviewData, 
-          'Movie Details':movieData });
-        }
-      }
-    );
+    const movieData = await movieModel.create(movie_obj);
+    req.body.movie = movieData._id;
+    let reviewData = await reviewModel.create(req.body);
+
+    return res.status(201).send({ Status: 'Success', 'User Review': reviewData, 
+    'Movie Details':movieData });
   } 
   catch (error) {
     res.status(500).send({ Status: 'Failed', Message: error.message });

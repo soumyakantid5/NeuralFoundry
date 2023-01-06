@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
+    uppercase:true,
     required: [true, "Please enter your Name"],
   },
 
@@ -10,6 +11,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Email id is a mandatory field"],
     unique: true,
+    trim:true
   },
 
   password: {

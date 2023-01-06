@@ -6,6 +6,7 @@ const reviewSchema = new mongoose.Schema(
     review: {
       type: String,
       required: [true, "Please Fill up your review properly"],
+      trim:true
     },
     rating: {
       type: Number,
@@ -15,7 +16,8 @@ const reviewSchema = new mongoose.Schema(
     },
     message: {
       type: String,
-      default:'Not Available'
+      default:'Not Available',
+      trim:true
     },
     movie: {
       type: ObjectId,
