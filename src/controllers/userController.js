@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const userModel = require("../models/userModel");
 const {isValidName,isValidEmail,isValidRequest,isValidValue} = require("../utils/validator");
 const saltRounds = 10;
+
 //----------------------------------USER-Sign Up --------------------------------//
 
 let register = async (req, res)=> {
@@ -23,7 +24,7 @@ let register = async (req, res)=> {
         return res.status(400).send({ Status:'Failed', Message:"Please enter your email"});
       }
       if (!isValidEmail(email)){
-        return res.status(400).send({ Status:'Failed', Message:"Email format is not correct"});
+        return res.status(400).send({ Status:'Failed', Message:"Email is not valid"});
       }
       let emailExist = await userModel.findOne({ email });
       if (emailExist){
@@ -49,39 +50,41 @@ let register = async (req, res)=> {
 
   //----------------------------------USER-Sign In --------------------------------//
   
-  let login = async function (req, res) {
+  let login = async (req, res) => {
     try {
-  
       const { email, password } = req.body;
 
       if (!isValidRequest(req.body)) {
       return res.status(400).send({ Status: 'Failed', Message:"Enter email & password"});
       }
-      if (!isValidValue(email)) 
+
+      if (!isValidValue(email)){ 
       return res.status(400).send({ Status: 'Failed', Messgage: "Enter your Email" });
+      }
       
-      let checkemail = await userModel.findOne({ email });
-      if (!checkemail) return res.status(404).send({ Status:'Failed', Message: "Email not found"});
+      let checkUser = await userModel.findOne({ email });
+      if (!checkUser) {
+        return res.status(404).send({ Status:'Failed', Message: "Email not found"});
+      }
   
       if (!isValidValue(password)) {
-        return res.status(400).send({ Status: 'Failed', Messsge: "Enter Password"})
+        return res.status(400).send({ Status: 'Failed', Messsge: "Enter Password to login"});
       }
   
-      let decryptPassword = await bcrypt.compare(password, checkemail.password);
+      let decryptPassword = await bcrypt.compare(password, checkUser.password);
       if (!decryptPassword) {
         return res.status(401).send({ Status: 'Failed', Message: "Password is not correct" });
-      }
-    
+      } 
      
  /***************************GENERATE TOKEN**********************/
   
-      let date = Date.now();
-      let createTime = Math.floor(date / 1000);
-      let expTime = createTime +( 60*60);
+      let currTimeStamp = Date.now();
+      let createTime = Math.floor(currTimeStamp / 1000);
+      let expTime = createTime + (60*60);
   
       let token = jwt.sign(
         {
-          userId: checkedUser._id.toString(),
+          userId: checkUser._id.toString(),
           iat: createTime,
           exp: expTime,
         },

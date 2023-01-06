@@ -11,7 +11,7 @@ const movieSchema = new mongoose.Schema({
         type:String,
     }
 },
-{versionKey:false,timestamps:true}
+{versionKey:false,timestamps:false}
 );
 
 module.exports = mongoose.model("Movie", movieSchema);

@@ -15,11 +15,12 @@ const reviewSchema = new mongoose.Schema(
     },
     message: {
       type: String,
+      default:'Not Available'
     },
     movie: {
       type: ObjectId,
       ref: "Movie",
-      required: [true, "Please Enter movie name "],
+      required: [true, "Please Enter movie name"],
     },
   },
   { versionKey: false, timestamps: true }

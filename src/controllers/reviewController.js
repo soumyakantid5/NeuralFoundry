@@ -1,14 +1,32 @@
 const request = require("request");
 const reviewModel = require("../models/reviewModel");
 const movieModel = require("../models/movieModel");
+const {isValidRequest,isValidValue} = require("../utils/validator");
 const API_KEY='231b38601ccd0b4ba999c87415f28a9c';
 
 //----------------------------------Create Review --------------------------------//
 
 const createReview = async (req, res)=> {
   try {
-    const movie = req.body.movie;
-   
+    
+    if (!isValidRequest(req.body)){
+      return res.status(400).send({ Status:'Failed', Message:"Please fill the details" });
+    }
+    const {review,rating,message,movie} = req.body;
+    
+    if(!review){
+      return res.status(400).send({ Status:'Failed', Message:"Review field can not be blank"});
+    }
+    if(!rating){
+      return res.status(400).send({ Status:'Failed', Message:"Please enter movie rating"});
+    }
+    if(rating<=0 || rating>5){
+      return res.status(400).send({ Status:'Failed', Message:"Rate from 1 to 5"});
+    }
+    if(!movie){
+      return res.status(400).send({ Status:'Failed', Message:"Please enter movie name"});
+    }
+
     request(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${movie}`,
       async (error, response, body) => {
         if (error) {
@@ -46,7 +64,7 @@ const createReview = async (req, res)=> {
 //----------------------------------Get Reviews --------------------------------//
 
 
-const getReview = async function (req, res) {
+const getReview = async (req, res) => {
   try {
    
   }
