@@ -2,13 +2,15 @@ const express = require('express')
 const router = express.Router()
 
 const {register,login} = require("../controllers/userController");
+const {createReview, getReview}=require("../controllers/reviewController");
 const {auth} = require("../middleware/auth")
 
 router.post("/register", register);
 router.post("/login", login);
 
 
-
+router.post("/createreview",auth,createReview)
+router.get("/getreview",getReview)
 
 //if api is invalid OR wrong URL
 router.all("*", (req, res) =>

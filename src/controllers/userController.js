@@ -11,8 +11,8 @@ let register = async (req, res)=> {
       let newUser = await userModel.create(data);
       return res.status(201).send({ Status: 'Success', 'User Details': newUser });
     } 
-    catch (err) {
-      res.status(500).send({ Status: 'Failed', Message: err.message });
+    catch (error) {
+      res.status(500).send({ Status: 'Failed', Message: error.message });
     }
   };
   
@@ -52,8 +52,8 @@ let register = async (req, res)=> {
       res.setHeader("x-api-key", token);
       return res.status(200).send({ Status: "Success", Token: token  });
     } 
-    catch (err) {
-      res.status(500).send({ Status: 'Failed', message: err.message });
+    catch (error) {
+      res.status(500).send({ Status: 'Failed', message: error.message });
     }
   };
   
