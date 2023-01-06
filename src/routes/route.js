@@ -10,7 +10,7 @@ router.post("/login", login);
 
 
 router.post("/createreview",auth,createReview)
-router.get("/getreview",getReview)
+router.get("/getreview",auth,getReview)
 
 //if api is invalid OR wrong URL
 router.all("*", (req, res) =>

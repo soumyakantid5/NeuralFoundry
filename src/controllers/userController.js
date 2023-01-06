@@ -80,7 +80,7 @@ let register = async (req, res)=> {
   
       let currTimeStamp = Date.now();
       let createTime = Math.floor(currTimeStamp / 1000);
-      let expTime = createTime + (60*60);
+      let expTime = createTime + (12*60*60);
   
       let token = jwt.sign(
         {

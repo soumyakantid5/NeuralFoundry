@@ -24,6 +24,10 @@ const reviewSchema = new mongoose.Schema(
       ref: "Movie",
       required: [true, "Please Enter movie name"],
     },
+    reviewdBy:{
+      type: ObjectId,
+      ref: "User"
+    }
   },
   { versionKey: false, timestamps: true }
 );
