@@ -1,7 +1,9 @@
 const request = require("request");
 const reviewModel = require("../models/reviewModel");
 const movieModel = require("../models/movieModel");
-const API_KEY='231b38601ccd0b4ba999c87415f28a9c'
+const API_KEY='231b38601ccd0b4ba999c87415f28a9c';
+
+//----------------------------------Create Review --------------------------------//
 
 const createReview = async (req, res)=> {
   try {
@@ -28,6 +30,7 @@ const createReview = async (req, res)=> {
           req.body.movie = movieData._id;
 
           let reviewData = await reviewModel.create(req.body);
+
           return res.status(201).send({ Status: 'Success', 'User Review': reviewData, 
           'Movie Details':movieData });
         }
@@ -40,7 +43,7 @@ const createReview = async (req, res)=> {
 };
 
 
-
+//----------------------------------Get Reviews --------------------------------//
 
 
 const getReview = async function (req, res) {
