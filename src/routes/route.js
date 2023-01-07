@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const {register, login} = require("../controllers/userController");
+const {register, login, updateUser} = require("../controllers/userController");
 
 const {createReview, getReview, updateReview} = require("../controllers/reviewController");
 
@@ -12,6 +12,7 @@ const {auth} = require("../middleware/auth");
 //User Controller
 router.post("/register", register);
 router.post("/login", login);
+router.put("/updateUser",auth,updateUser)
 
 //Review Controller
 router.post("/createreview",auth,createReview);

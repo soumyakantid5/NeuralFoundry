@@ -6,7 +6,7 @@ const saltRounds = 10;
 
 //----------------------------------USER-Sign Up --------------------------------//
 
-let register = async (req, res)=> {
+const register = async (req, res)=> {
     try {
       if (!isValidRequest(req.body)){
         return res.status(400).send({ Status:'Failed', Message:"Please fill the details" });
@@ -34,6 +34,9 @@ let register = async (req, res)=> {
       if (password.length < 8 || password.length > 15){
         return res.status(400).send({ Status:'Failed', Message:"Password length should be between 8 to 15"});
       }
+      if(req.body.password.trim().length!==req.body.password.length){
+        return res.status(400).send({ Status:'Failed', Message:"Space is not allowed in Password"});
+      }
       req.body.password = await bcrypt.hash(password, saltRounds);
 
       let newUser = await userModel.create(req.body);
@@ -50,7 +53,7 @@ let register = async (req, res)=> {
 
   //----------------------------------USER-Sign In --------------------------------//
   
-  let login = async (req, res) => {
+  const login = async (req, res) => {
     try {
       const { email, password } = req.body;
 
@@ -99,6 +102,63 @@ let register = async (req, res)=> {
     }
   };
   
-  module.exports= {register,login};
+
+
+  //----------------------------------USER-Profile Update --------------------------------//
+
+
+const updateUser = async (req,res) => {
+    try {
+      if (!isValidRequest(req.body)){
+        return res.status(400).send({ Status:'Failed', Message:"Nothing to update" });
+      }
+      const { name, email, password } = req.body;
+
+      if(Object.keys(req.body).includes('name')){
+        if (!isValidValue(name)){
+          return res.status(400).send({ Status:'Failed', Message:"Please enter your Name"});
+        }
+        if (!isValidName(name)){
+          return res.status(400).send({ Status:'Failed', Message:"Enter your name properly"});
+        }
+      }
+
+      if(Object.keys(req.body).includes('email')){
+        if (!isValidValue(email)){
+          return res.status(400).send({ Status:'Failed', Message:"Please enter your email"});
+        }
+        if (!isValidEmail(email)){
+          return res.status(400).send({ Status:'Failed', Message:"Email is not valid"});
+        }
+        let emailExist = await userModel.findOne({ email });
+        if (emailExist){
+          return res.status(400).send({ Status: 'Failed', Message: "This email already exists" });
+        }
+      }
+
+      if(Object.keys(req.body).includes('password')){
+        if (password.length < 8 || password.length > 15){
+          return res.status(400).send({ Status:'Failed', Message:"Password length should be between 8 to 15"});
+        }
+        if(req.body.password.trim().length!==req.body.password.length){
+          return res.status(400).send({ Status:'Failed', Message:"Space is not allowed in Password"});
+        }
+        req.body.password = await bcrypt.hash(password, saltRounds);
+      }
+
+      await userModel.findByIdAndUpdate({ _id: req.userId },req.body,{ new: true });
+      return res.status(200).send({ Status: "Success", "Message":'User Profile Updated' });
+    } 
+    catch (error) {
+      res.status(500).send({ Status: 'Failed', Message: error.message });
+    }
+}
+
+
+
+
+
+
+  module.exports= {register,login,updateUser};
   
   
