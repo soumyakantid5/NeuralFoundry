@@ -2,7 +2,7 @@
 const isValidRequest = (value) => Object.keys(value).length > 0;
 
 //value validation
-const isValidValue = (value)=>{
+const isValidValue = (value) => {
   if (typeof value === "undefined" || value === null) return false;
   if (typeof value === "string" && value.trim().length === 0) return false;
   if (typeof value === "number") return false;

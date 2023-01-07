@@ -1,45 +1,55 @@
+const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const userModel = require("../models/userModel");
 const {isValidName,isValidEmail,isValidRequest,isValidValue} = require("../utils/validator");
 const saltRounds = 10;
 
+
 //----------------------------------USER-Sign Up --------------------------------//
 
-const register = async (req, res)=> {
+const register = async (req, res) => {
     try {
-      if (!isValidRequest(req.body)){
-        return res.status(400).send({ Status:'Failed', Message:"Please fill the details" });
-      }
       const { name, email, password } = req.body;
 
-      if (!isValidValue(name)){
-        return res.status(400).send({ Status:'Failed', Message:"Please enter your Name"});
-      }
-      if (!isValidName(name)){
-        return res.status(400).send({ Status:'Failed', Message:"Enter your name properly"});
+      //Request Validation
+      if (!isValidRequest(req.body)) {
+        return res.status(400).send({ Status:'Failed', Message:"Please fill the details" });
       }
 
-      if (!isValidValue(email)){
+      //Name Validation
+      if (!isValidValue(name)) {
+        return res.status(400).send({ Status:'Failed', Message:"Please enter your Name" });
+      }
+      if (!isValidName(name)) {
+        return res.status(400).send({ Status:'Failed', Message:"Enter your name properly" });
+      }
+
+      //Email Validation & Duplicate Checking
+      if (!isValidValue(email)) {
         return res.status(400).send({ Status:'Failed', Message:"Please enter your email"});
       }
-      if (!isValidEmail(email)){
+      if (!isValidEmail(email)) {
         return res.status(400).send({ Status:'Failed', Message:"Email is not valid"});
       }
-      let emailExist = await userModel.findOne({ email });
-      if (emailExist){
+
+      const emailExist = await userModel.findOne({ email });
+      if (emailExist) {
         return res.status(400).send({ Status: 'Failed', Message: "This email already exists" });
       }
 
+      //Password Validation
       if (password.length < 8 || password.length > 15){
-        return res.status(400).send({ Status:'Failed', Message:"Password length should be between 8 to 15"});
+        return res.status(400).send({ Status:'Failed', 
+        Message:"Password length should be between 8 to 15" });
       }
       if(req.body.password.trim().length!==req.body.password.length){
-        return res.status(400).send({ Status:'Failed', Message:"Space is not allowed in Password"});
+        return res.status(400).send({ Status:'Failed', Message:"Space not allowed in Password" });
       }
-      req.body.password = await bcrypt.hash(password, saltRounds);
-
+      
+      req.body.password = await bcrypt.hash(password, saltRounds);    //Password Hashing
       let newUser = await userModel.create(req.body);
+
       newUser=newUser.toObject();
       delete newUser.password;
 
@@ -51,25 +61,29 @@ const register = async (req, res)=> {
   };
   
 
+
   //----------------------------------USER-Sign In --------------------------------//
   
   const login = async (req, res) => {
     try {
       const { email, password } = req.body;
 
+      //Request Validation
       if (!isValidRequest(req.body)) {
-      return res.status(400).send({ Status: 'Failed', Message:"Enter email & password"});
+      return res.status(400).send({ Status: 'Failed', Message:"Enter email & password" });
       }
 
+      //Email Validation
       if (!isValidValue(email)){ 
       return res.status(400).send({ Status: 'Failed', Messgage: "Enter your Email" });
       }
       
-      let checkUser = await userModel.findOne({ email });
+      const checkUser = await userModel.findOne({ email });
       if (!checkUser) {
         return res.status(404).send({ Status:'Failed', Message: "Email not found"});
       }
-  
+      
+      //Password Validation
       if (!isValidValue(password)) {
         return res.status(400).send({ Status: 'Failed', Messsge: "Enter Password to login"});
       }
@@ -79,23 +93,24 @@ const register = async (req, res)=> {
         return res.status(401).send({ Status: 'Failed', Message: "Password is not correct" });
       } 
      
- /***************************GENERATE TOKEN**********************/
+
+      //TOKEN CREATION
+
+      const currTimeStamp = Date.now();
+      const createTime = Math.floor(currTimeStamp / 1000);
+      const expTime = createTime + (12*60*60);
   
-      let currTimeStamp = Date.now();
-      let createTime = Math.floor(currTimeStamp / 1000);
-      let expTime = createTime + (12*60*60);
-  
-      let token = jwt.sign(
+      const token = jwt.sign(
         {
           userId: checkUser._id.toString(),
           iat: createTime,
           exp: expTime,
         },
-        "neuralfoundry"
+        process.env.JWT_TOKEN
       );
   
       res.setHeader("x-api-key", token);
-      return res.status(200).send({ Status: "Success", Token: token  });
+      return res.status(200).send({ Status: "Success", Token: token });
     } 
     catch (error) {
       res.status(500).send({ Status: 'Failed', Message: error.message });
@@ -104,49 +119,57 @@ const register = async (req, res)=> {
   
 
 
-  //----------------------------------USER-Profile Update --------------------------------//
 
+  //----------------------------------USER-Profile Update --------------------------------//
 
 const updateUser = async (req,res) => {
     try {
-      if (!isValidRequest(req.body)){
-        return res.status(400).send({ Status:'Failed', Message:"Nothing to update" });
-      }
       const { name, email, password } = req.body;
 
+      //Request Validation
+      if (!isValidRequest(req.body)) {
+        return res.status(400).send({ Status:'Failed', Message:"Nothing to update" });
+      }
+      
+      //Name Validation
       if(Object.keys(req.body).includes('name')){
-        if (!isValidValue(name)){
-          return res.status(400).send({ Status:'Failed', Message:"Please enter your Name"});
+        if (!isValidValue(name)) {
+          return res.status(400).send({ Status:'Failed', Message:"Please enter your Name" });
         }
-        if (!isValidName(name)){
-          return res.status(400).send({ Status:'Failed', Message:"Enter your name properly"});
+        if (!isValidName(name)) {
+          return res.status(400).send({ Status:'Failed', Message:"Enter your name properly" });
         }
       }
 
+      //Email Validation
       if(Object.keys(req.body).includes('email')){
-        if (!isValidValue(email)){
+        if (!isValidValue(email)) {
           return res.status(400).send({ Status:'Failed', Message:"Please enter your email"});
         }
-        if (!isValidEmail(email)){
+        if (!isValidEmail(email)) {
           return res.status(400).send({ Status:'Failed', Message:"Email is not valid"});
         }
         let emailExist = await userModel.findOne({ email });
-        if (emailExist){
+        if (emailExist) {
           return res.status(400).send({ Status: 'Failed', Message: "This email already exists" });
         }
       }
 
-      if(Object.keys(req.body).includes('password')){
-        if (password.length < 8 || password.length > 15){
-          return res.status(400).send({ Status:'Failed', Message:"Password length should be between 8 to 15"});
+      //Password Validation
+      if(Object.keys(req.body).includes('password')) {
+        if (password.length < 8 || password.length > 15) {
+          return res.status(400).send({ Status:'Failed', 
+            Message:"Password length should be between 8 to 15" });
         }
-        if(req.body.password.trim().length!==req.body.password.length){
-          return res.status(400).send({ Status:'Failed', Message:"Space is not allowed in Password"});
+
+        if(req.body.password.trim().length!==req.body.password.length) {
+          return res.status(400).send({ Status:'Failed', Message:"Space not allowed in Password"});
         }
-        req.body.password = await bcrypt.hash(password, saltRounds);
+        //Hashing Password
+        req.body.password = await bcrypt.hash(password, saltRounds);  
       }
 
-      await userModel.findByIdAndUpdate({ _id: req.userId },req.body,{ new: true });
+      await userModel.findByIdAndUpdate({ _id: req.userId }, req.body, { new: true });
       return res.status(200).send({ Status: "Success", "Message":'User Profile Updated' });
     } 
     catch (error) {
@@ -156,9 +179,39 @@ const updateUser = async (req,res) => {
 
 
 
+  //----------------------------------USER-Profile Delete --------------------------------//
+
+const deleteUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    //USER-ID Validation
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(400).send({ Status: "Failed", Message: "UserId is not a valid Id" });
+    }
+
+    const userData = await userModel.findOne({ _id: userId });
+    if (!userData) {
+      return res.status(404).send({ Status: "Failed", Message: "User Id is not correct" });
+    }
+
+    //Authorization Check
+    if (req.userId !== userData._id.toString()) {
+      return res.status(403).send({Status: "Failed",
+          Message: "You're not allowed to delete this account",});
+    }
+
+    //Permanently deleting User account. Ideally we use a flag isDeleted to just hide the account.
+    await userModel.findByIdAndRemove({ _id: userId });
+    return res.status(204).send({ Status: "Success" });
+  } 
+  catch (error) {
+    res.status(500).send({ Status: "Failed", Message: error.message });
+  }
+};
 
 
 
-  module.exports= {register,login,updateUser};
+  module.exports= {register, login, updateUser, deleteUser};
   
   

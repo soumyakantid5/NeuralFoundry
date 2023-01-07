@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { auth } = require("../middleware/auth");
 
-const { register, login, updateUser } = require("../controllers/userController");
+const { register, login, updateUser, deleteUser } = require("../controllers/userController");
 
-const {createReview,getReview,updateReview,deleteReview} =require("../controllers/reviewController");
+const {createReview,getReview,updateReview,deleteReview} = require("../controllers/reviewController");
 
 const { getMovieReviewsByAllUsers } = require("../controllers/movieController");
 
@@ -13,7 +13,7 @@ const { getMovieReviewsByAllUsers } = require("../controllers/movieController");
 router.post("/register", register);
 router.post("/login", login);
 router.put("/updateUser", auth, updateUser);
-
+router.delete("/deleteUser/:userId", auth, deleteUser);
 
 //Review Controller
 router.post("/createreview", auth, createReview);
@@ -29,6 +29,5 @@ router.get("/:movie", getMovieReviewsByAllUsers);
 router.all("*", (req, res) =>
     res.status(404).send({status: false,message: "The api you requested is not available"})
 );
-
 
 module.exports = router;
