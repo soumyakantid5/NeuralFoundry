@@ -51,6 +51,7 @@ const createReview = async (req, res) => {
     
     if (movieRecord) {
       req.body.movie = movieRecord._id;
+      req.body.reviewdBy = req.userId;
       let reviewData = await reviewModel.create(req.body);
       return res
         .status(201)
@@ -89,7 +90,7 @@ const createReview = async (req, res) => {
 
     req.body.movie = movieData._id;
     req.body.reviewdBy = req.userId;
-    
+   
     let reviewData = await reviewModel.create(req.body);
 
     return res
@@ -134,4 +135,86 @@ const getReview = async (req, res) => {
 
 
 
-module.exports = { createReview, getReview };
+
+//--------------------------------Edit Reviews [By Authorized User] -------------------------//
+
+const updateReview = async (req, res) => {
+  try {
+    let reviewId = req.params.reviewId;
+
+    let reviewData = await reviewModel.findOne({ _id:reviewId })
+
+    if (!reviewData) {
+      return res
+        .status(404)
+        .send({ Status: "Failed", Message: "Review Id is not correct" });
+    }
+
+
+    if(req.userId!==reviewData.reviewdBy.toString()){
+      return res
+        .status(403)
+        .send({ Status: "Failed", Message: "You're not allowed to make the changes" });
+    }
+
+
+
+    if (!isValidRequest(req.body)) {
+      return res
+        .status(400)
+        .send({ Status: "Failed", Message: "There is nothing to update" });
+    }
+
+    let { review, rating, message, movie } = req.body;
+    
+    if(Object.keys(req.body).includes('review')){
+      if (!isValidValue(review)) {
+        return res
+          .status(400)
+          .send({ Status: "Failed", Message: "Review field can not be blank" });
+      }
+    }
+
+
+    if(Object.keys(req.body).includes('rating')){
+      if (!rating || isNaN(rating) ) {
+        return res
+          .status(400)
+          .send({
+            Status: "Failed",
+            Message: "Please enter movie rating in Number",
+          });
+      }
+      if (rating <= 0 || rating > 5) {
+        return res
+          .status(400)
+          .send({ Status: "Failed", Message: "Rate from 1 to 5" });
+      }
+    }
+
+
+
+
+    if(Object.keys(req.body).includes('movie')){
+      return res
+        .status(400)
+        .send({ Status: "Failed", Message: "Movie name can not be changed" });
+    }
+    
+
+    let modifiedData = await reviewModel.findByIdAndUpdate({ _id: reviewId },req.body,{ new: true, upsert: true });
+
+    return res
+      .status(200)
+      .send({ Status: "Success", "Updated Review Data": modifiedData });
+  } catch (error) {
+    res.status(500).send({ Status: "Failed", Message: error.message });
+  }
+};
+
+
+
+
+
+
+module.exports = { createReview, getReview, updateReview};
