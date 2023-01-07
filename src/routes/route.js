@@ -3,7 +3,7 @@ const router = express.Router()
 
 const {register,login} = require("../controllers/userController");
 const {createReview, getReview}=require("../controllers/reviewController");
-const {auth} = require("../middleware/auth")
+const {auth} = require("../middleware/auth");
 
 router.post("/register", register);
 router.post("/login", login);

@@ -18,7 +18,7 @@ const createReview = async (req, res) => {
     }
 
     let { review, rating, message, movie } = req.body;
-    movie = movie.trim();
+    movie = movie.trim().toLowerCase();
 
     if (!isValidValue(review)) {
       return res
@@ -48,6 +48,7 @@ const createReview = async (req, res) => {
     }
 
     let movieRecord = await movieModel.findOne({ title: movie });
+    
     if (movieRecord) {
       req.body.movie = movieRecord._id;
       let reviewData = await reviewModel.create(req.body);
@@ -61,21 +62,34 @@ const createReview = async (req, res) => {
     }
 
     let response = await axios.get(`${BASE_URL}?api_key=${API_KEY}&query=${movie}`);
+
     if (response.data.results.length == 0) {
       return res
         .status(404)
-        .send({ Status: "Failed", Message: "No record found" });
+        .send({ Status: "Failed", Message: "No record found.Try with different movie name" });
     }
 
-    const movie_record = response.data.results[0];
-    let { id, title, poster_path, overview, popularity, release_date } = movie_record;
-    const movie_id = id;
-    poster_path = POSTER_URL + movie_record.poster_path;
-    let movie_obj = {movie_id,title,poster_path,overview,popularity,release_date,};
+    let items=response.data.results;
+    let index=0;
 
-    const movieData = await movieModel.create(movie_obj);
+    for(;index<items.length;index++){
+      if(movie==items[index].title.toLowerCase()) break;
+    }
+
+    if(index==items.length){
+      return res
+        .status(404)
+        .send({ Status: "Failed", Message: "No record found.Please check movie name." });
+    }
+
+    const movie_record = items[index];
+    movie_record.poster_path = POSTER_URL + movie_record.poster_path;
+
+    const movieData = await movieModel.create(movie_record);
+
     req.body.movie = movieData._id;
     req.body.reviewdBy = req.userId;
+    
     let reviewData = await reviewModel.create(req.body);
 
     return res
@@ -89,6 +103,10 @@ const createReview = async (req, res) => {
     res.status(500).send({ Status: "Failed", Message: error.message });
   }
 };
+
+
+
+
 
 //--------------------------------Get All Reviews [By logged in User] -------------------------//
 
@@ -112,5 +130,8 @@ const getReview = async (req, res) => {
     res.status(500).send({ Status: "Failed", Message: error.message });
   }
 };
+
+
+
 
 module.exports = { createReview, getReview };
