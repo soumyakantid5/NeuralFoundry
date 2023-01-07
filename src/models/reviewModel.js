@@ -27,7 +27,7 @@ const reviewSchema = new mongoose.Schema(
     reviewdBy:{
       type: ObjectId,
       ref: "User"
-    }
+    },
   },
   { versionKey: false, timestamps: true }
 );
