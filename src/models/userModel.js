@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     minlength: 8,
   },
 },
-{versionKey:false,timestamps:true}
+{timestamps:true, versionKey:false}
 );
 
 module.exports = mongoose.model("User", userSchema);

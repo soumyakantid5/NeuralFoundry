@@ -11,7 +11,7 @@ const movieSchema = new mongoose.Schema({
     popularity:Number,
     release_date:String,
 },
-{versionKey:false,timestamps:false}
+{ timestamps:false, versionKey:false }
 );
 
 module.exports = mongoose.model("Movie", movieSchema);

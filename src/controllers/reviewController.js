@@ -59,9 +59,7 @@ const createReview = async (req, res) => {
       });
     }
 
-    let response = await axios.get(
-      `${BASE_URL}?api_key=${API_KEY}&query=${movie}`
-    );
+    let response = await axios.get(`${BASE_URL}?api_key=${API_KEY}&query=${movie}`);
 
     if (response.data.results.length == 0) {
       return res
@@ -108,6 +106,8 @@ const createReview = async (req, res) => {
   }
 };
 
+
+
 //--------------------------------Get All Reviews [By logged in User] -------------------------//
 
 const getReview = async (req, res) => {
@@ -130,6 +130,8 @@ const getReview = async (req, res) => {
     res.status(500).send({ Status: "Failed", Message: error.message });
   }
 };
+
+
 
 //--------------------------------Edit Reviews [By Authorized User] -------------------------//
 
@@ -239,7 +241,8 @@ const deleteReview = async (req, res) => {
 
     await reviewModel.findByIdAndRemove({ _id: reviewId });
     return res.status(204).send({ Status: "Success" });
-  } catch (error) {
+  } 
+  catch (error) {
     res.status(500).send({ Status: "Failed", Message: error.message });
   }
 };

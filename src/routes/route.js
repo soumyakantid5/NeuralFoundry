@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const {auth} = require("../middleware/auth");
+const { auth } = require("../middleware/auth");
 
-const {register, login, updateUser} = require("../controllers/userController");
+const { register, login, updateUser } = require("../controllers/userController");
 
 const {createReview,getReview,updateReview,deleteReview} =require("../controllers/reviewController");
 
-const {getMovieReviewsByAllUsers} = require("../controllers/movieController");
+const { getMovieReviewsByAllUsers } = require("../controllers/movieController");
 
 
 //User Controller
