@@ -24,11 +24,18 @@
 
  ## MOVIE APIs
 ## 1) GET API - Fetching all Reviews for a movie . [Public_Route]
-
+    This api take a movie name as a input through params & returns all the reviews for this movie.
 
  ## MIDDLEWARE API
 ## 1) Authentication
 
+I have deployed the code on Railway app.You can only fetch movie reviews [Movie_API]
+Please go to the link & search for movies
+Available movies currently - Swades,Veer-Zaara,Sholay,3 Idiots
+I will add more movie reviews soon...
+
+Link>>>   https://neuralfoundry-production.up.railway.app/movie_name
+Example - https://neuralfoundry-production.up.railway.app/swades
 
 `     -------- Thanks for reading -----------     `
                 **SOUMYA DUTTA**

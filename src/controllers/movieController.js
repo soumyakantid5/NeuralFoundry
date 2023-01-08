@@ -7,11 +7,11 @@ const reviewModel = require("../models/reviewModel");
 module.exports.getMovieReviewsByAllUsers = async (req, res) => {
   try {
     const movie = req.params.movie;
-    const movieExists = await movieModel.findOne({ title: movie })
+    const movieExists = await movieModel.findOne({ title: movie }).pretty()
 
     if (movieExists) {
       const reviewData = await reviewModel.find({ movie: movieExists._id }).
-        select({ _id:0, movie:0, reviewdBy:0 });
+        select({ _id:0, movie:0, reviewdBy:0 }).pretty();
 
       if (reviewData.length > 0){
         return res.status(200).send({ Status: "Success","User Review": reviewData,

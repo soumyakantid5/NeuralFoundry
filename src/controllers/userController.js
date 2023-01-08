@@ -39,7 +39,7 @@ const register = async (req, res) => {
       }
 
       //Password Validation
-      if (password.length < 8 || password.length > 15){
+      if (!password || password.length < 8 || password.length > 15){
         return res.status(400).send({ Status:'Failed', 
         Message:"Password length should be between 8 to 15" });
       }
@@ -165,6 +165,7 @@ const updateUser = async (req,res) => {
         if(req.body.password.trim().length!==req.body.password.length) {
           return res.status(400).send({ Status:'Failed', Message:"Space not allowed in Password"});
         }
+        
         //Hashing Password
         req.body.password = await bcrypt.hash(password, saltRounds);  
       }

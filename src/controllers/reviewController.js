@@ -4,11 +4,6 @@ const reviewModel = require("../models/reviewModel");
 const movieModel = require("../models/movieModel");
 const { isValidRequest, isValidValue } = require("../utils/validator");
 
-//TMDB API DETAILS
-const API_KEY = "231b38601ccd0b4ba999c87415f28a9c";
-const BASE_URL = "https://api.themoviedb.org/3/search/movie";
-const POSTER_URL = "https://image.tmdb.org/t/p/w500";
-
 
 
 //----------------------------------Create Review --------------------------------//
@@ -22,20 +17,14 @@ const createReview = async (req, res) => {
       return res.status(400).send({ Status: "Failed", Message: "Please fill the details" });
     }
 
-    movie = movie.trim().toLowerCase();
-
     //Review Validation
     if (!isValidValue(review)) {
       return res.status(400).send({ Status: "Failed", Message: "Review field can not be blank" });
     }
 
     //Rating Validation
-    if (!rating || isNaN(rating)) {
-      return res.status(400).send({ Status: "Failed",Message: "Movie rating should be in Number" });
-    }
-
-    if (rating < 1 || rating > 5) {
-      return res.status(400).send({ Status: "Failed", Message: "Rate from 1 to 5" });
+    if (!rating || isNaN(rating) || (rating < 1 || rating > 5)) {
+      return res.status(400).send({ Status: "Failed",Message: "Rate movie from 1 to 5" });
     }
 
     //Movie Name Validation
@@ -43,6 +32,7 @@ const createReview = async (req, res) => {
       return res.status(400).send({ Status: "Failed", Message: "Please enter movie name" });
     }
 
+    movie = movie.trim().toLowerCase();
     //Checking if movie record is present in local DB
     let movieRecord = await movieModel.findOne({ title: movie });
 
@@ -58,7 +48,7 @@ const createReview = async (req, res) => {
     }
 
     //If movie not found in DB, then call API
-    let response = await axios.get(`${BASE_URL}?api_key=${API_KEY}&query=${movie}`);
+    let response = await axios.get(`${process.env.BASE_URL}?api_key=${process.env.API_KEY}&query=${movie}`);
 
     //If movie not found in cloud
     if (response.data.results.length == 0) {
@@ -82,7 +72,7 @@ const createReview = async (req, res) => {
 
     //If match found from the list of movies
     const movie_record = items[index];
-    movie_record.poster_path = POSTER_URL + movie_record.poster_path;
+    movie_record.poster_path = process.env.POSTER_URL + movie_record.poster_path;
 
     const movieData = await movieModel.create(movie_record);  //Storing Movie record in DB
 
