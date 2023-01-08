@@ -8,7 +8,6 @@ const {createReview,getReview,updateReview,deleteReview} = require("../controlle
 
 const { getMovieReviewsByAllUsers } = require("../controllers/movieController");
 
-
 //User Controller
 router.post("/register", register);
 router.post("/login", login);
@@ -24,10 +23,16 @@ router.delete("/deletereview/:reviewId", auth, deleteReview);
 //Movie Controller
 router.get("/:movie", getMovieReviewsByAllUsers);
 
+//If user try to search home page [ without any specfic route]
+router.all("/", (req,res) => {
+    return res.status(200).send({ Status: "HELLO.NICE TO SEE YOU HERE. " ,
+    Message:" TRY SPECIFIC ROUTES TO SIGN UP, SIGN IN, CREATE-READ-UPDATE-DELETE REVIEW OR FETCH ALL REVIEWS FOR A PARTICULAR MOVIE" });
+})
 
 //if api is invalid OR wrong URL
-router.all("*", (req, res) =>
-    res.status(404).send({status: false,message: "The api you requested is not available"})
+router.all("*", (req, res) => {
+    res.status(404).send({ Status: false, Message: "THE API YOU REQUESTED IS NOT AVAILABLE" })
+    }
 );
 
 module.exports = router;
