@@ -13,7 +13,7 @@ router.post("/register", register);
 router.post("/login", login);
 router.put("/updateUser", auth, updateUser);
 router.delete("/deleteUser/:userId", auth, deleteUser);
-router.get("/forgotPassword",forgotPassword);
+router.post("/forgotPassword",forgotPassword);
 router.post("/verifyotp",verifyOtp)
 
 //Review Controller

@@ -16,12 +16,12 @@
 					"formdata": [
 						{
 							"key": "name",
-							"value": "Soumya Dutta",
+							"value": "Anish Tiwari",
 							"type": "text"
 						},
 						{
 							"key": "email",
-							"value": "s@gmail.com",
+							"value": "anishtiwari1531@gmail.com",
 							"type": "text"
 						},
 						{
@@ -55,7 +55,7 @@
 					"formdata": [
 						{
 							"key": "email",
-							"value": "s@gmail.com",
+							"value": "anishtiwari1531@gmail.com",
 							"type": "text"
 						},
 						{
@@ -161,6 +161,74 @@
 			"response": []
 		},
 		{
+			"name": "forgotPassword",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "anishtiwari1531@gmail.com",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5000/forgotPassword",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"forgotPassword"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "verifyOtp",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "anishtiwari1531@gmail.com",
+							"type": "text"
+						},
+						{
+							"key": "otp",
+							"value": "226915",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "12345678",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5000/verifyotp",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"verifyotp"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "createReview",
 			"request": {
 				"auth": {
@@ -168,7 +236,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2JhMjhhM2RjNDlkN2Q2YzExNGVmOGYiLCJpYXQiOjE2NzMxNDQ0ODksImV4cCI6MTY3MzE4NzY4OX0.xf1rPF3jxzXxx-H2PIYwAUygT8JH2H4FHH8qKS5pRFs",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2JhMmRmNWFjNTgzOGI2ODg2ZGQ5ZmQiLCJpYXQiOjE2NzMxNDU4NTQsImV4cCI6MTY3MzE4OTA1NH0.oOtRmwM_8C0L_dTVkYvXKzC2ihwkastQ6HDptoR-ICI",
 							"type": "string"
 						}
 					]
@@ -180,7 +248,7 @@
 					"formdata": [
 						{
 							"key": "review",
-							"value": "Nice Movie",
+							"value": "Life lessons",
 							"type": "text"
 						},
 						{
@@ -190,12 +258,13 @@
 						},
 						{
 							"key": "message",
-							"value": "Must Watch",
-							"type": "text"
+							"value": "Close to Earth",
+							"type": "text",
+							"disabled": true
 						},
 						{
 							"key": "movie",
-							"value": "3 idiots",
+							"value": "veer-zaara",
 							"type": "text"
 						}
 					]
@@ -351,14 +420,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5000/3 idiots",
+					"raw": "http://localhost:5000/swades",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "5000",
 					"path": [
-						"3 idiots"
+						"swades"
 					]
 				}
 			},
