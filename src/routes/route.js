@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { auth } = require("../middleware/auth");
 
-const { register, login, updateUser, deleteUser } = require("../controllers/userController");
+const { register, login, updateUser, deleteUser, forgotPassword, verifyOtp } = require("../controllers/userController");
 
 const {createReview,getReview,updateReview,deleteReview} = require("../controllers/reviewController");
 
@@ -13,6 +13,8 @@ router.post("/register", register);
 router.post("/login", login);
 router.put("/updateUser", auth, updateUser);
 router.delete("/deleteUser/:userId", auth, deleteUser);
+router.get("/forgotPassword",forgotPassword);
+router.post("/verifyotp",verifyOtp)
 
 //Review Controller
 router.post("/createreview", auth, createReview);

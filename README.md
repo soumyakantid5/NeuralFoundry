@@ -1,10 +1,12 @@
 # NeuralFoundry ---- Neural Foundry Tech Test(Node js) 
 
 ## IMDB like Clone
-*Total 10 APIs, 4 User API, 4 Review API, 1 Movie API & 1 Authentication API. This is a thorough backend handle of a movie mreview platform such as “IMDB”. So, the flow of Apis are like this >>>*
+*Total 12 APIs, 6 User API, 4 Review API, 1 Movie API & 1 Authentication API. This is a thorough backend handle of a movie mreview platform such as “IMDB”. So, the flow of Apis are like this >>>*
 
-**Users register themselves, then they log in to their account. They can also update & delete their account.**
+**Users register themselves, then they log in to their account. They can also update & delete their account.If they forgot password, then can reset password by sending otp to their registered Email**
+
 **After login, user can give review & rate movies ,they can update review later. Users can also see what reviews they've given. They are also able to delete reviews.**
+
 **If any user who do not want to login,they can only see what reviews given by others for a specific movie. The details of reviewer will not be shown there!**
 
 
@@ -13,6 +15,8 @@
 ## 2) POST API – Logging in the User.               [Public_Route]
 ## 3) PUT API – Updating a profile.
 ## 4) DELETE API – Deleting a profile.
+## 5) FORGOT PASSWORD API – Sending OTP to Email.   [Public_Route]
+## 6) VERIFY OTP API – Verify OTP & Reset Password. [Public_Route]
 
 
  ## REVIEW APIs

@@ -1,10 +1,14 @@
+const nodemailer = require("nodemailer");
+const sgMail = require('@sendgrid/mail'); 
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const userModel = require("../models/userModel");
+const otpModel = require("../models/otpModel")
 const {isValidName,isValidEmail,isValidRequest,isValidValue} = require("../utils/validator");
 const saltRounds = 10;
-
+let triesLeft;
 
 //----------------------------------USER-Sign Up --------------------------------//
 
@@ -212,7 +216,110 @@ const deleteUser = async (req, res) => {
 };
 
 
+    //----------------------------------Forgot Password--------------------------------//
 
-  module.exports= {register, login, updateUser, deleteUser};
+//USING NODE MAILER
+const forgotPassword = async (req,res) => {
+  try{
+  let testAccount = await nodemailer.createTestAccount();
+  const email = req.body.email ;
+  triesLeft = 3;
+
+  let userRecord = await userModel.findOne({email});
+  if(!userRecord) {
+    return res.status(404).send({ Status: "Failed", Message: "User Doesn't exists" });
+  }
+  const otp = Math.random().toString().substring(2, 8);
+  //Math.floor(100000 + Math.random() * 900000);
+
+  // create reusable transporter object using the default SMTP transport
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.ethereal.email',
+    port: 587,
+    auth: {
+        user: 'nova.bogisich83@ethereal.email',
+        pass: 'ShSg1ygNrXKQfUHtgk'
+    }
+  });
+
+  // send mail with defined transport object
+  let info = await transporter.sendMail({
+    from: '"Fred Foo 👻" <foo@example.com>', // sender address
+    to: email, // list of receivers
+    subject: "Verification Password", // Subject line
+    text: "Your One Time Password is  "+otp, // plain text body
+   // html: "<b>Verification Password</b>", // html body
+  });
+
+  await otpModel.create({ email, otp });
+
+  return res.status(200).send(`Message sent: ${info.messageId}, Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
+  }
+  catch (error) {
+    res.status(500).send({ Status: "Failed", Message: error.message });
+  }
+}
+
+
+//USING SENDGRID
+// const forgotPassword = async (req,res) => {
+//     try{
+//       let email =req.body.email; 
+
+//       const msg = {
+//         to: 'soumyakantid6@gmail.com', // Change to your recipient
+//         from: 'soumyakantid6@gmail.com', // Change to your verified sender
+//         subject: 'Sending with SendGrid is Fun',
+//         text: 'and easy to do anywhere, even with Node.js',
+//         html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+//       }
+
+//       let response = await sgMail.send(msg)
+//       console.log(response);
+
+//    }
+//   catch (error) {
+//     res.status(500).send({ Status: "Failed", Message: error.message });
+//   }
+//   }
+
+
+
+    //----------------------------------Verify OTP --------------------------------//
+
+
+const verifyOtp = async (req,res) => {
+    try{
+      
+      const { email, otp, password } = req.body;
+      const fiveMinutesAgo = new Date(Date.now() - 1000 * 60 * 5);
+      const otpData = await otpModel.findOne({ email, otp, timestamp: { $gte: fiveMinutesAgo } });
+      
+      if(triesLeft==0){
+        await otpModel.deleteMany();
+        return res.status(400).send({Status:"Failed", Message: 'You\'ve reached maximum tries' });
+      }
+
+      if (otpData) {
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        await userModel.updateOne({ email }, { password: hashedPassword });
+        await otpModel.deleteOne({otp});
+        
+        res.status(200).send({Status:"Success", Message: 'Password reset successful. Please login again with your new password' });
+      } 
+      else {
+          triesLeft--;
+          res.status(400).send({Status:"Failed", Message: `Invalid OTP,Tries Left:${triesLeft}` });
+      }
+    }
+    catch (error) {
+      res.status(500).send({ Status: "Failed", Message: error.message });
+    }
+}
+
+
+
+
+  module.exports= {register, login, updateUser, deleteUser, forgotPassword, verifyOtp};
   
   
