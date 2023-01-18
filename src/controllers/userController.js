@@ -221,7 +221,7 @@ const deleteUser = async (req, res) => {
 //USING NODE MAILER
 const forgotPassword = async (req,res) => {
   try{
-  let testAccount = await nodemailer.createTestAccount();
+  //let testAccount = await nodemailer.createTestAccount();
   const email = req.body.email ;
   triesLeft = 3;
 
@@ -233,18 +233,31 @@ const forgotPassword = async (req,res) => {
   //Math.floor(100000 + Math.random() * 900000);
 
   // create reusable transporter object using the default SMTP transport
+  // const transporter = nodemailer.createTransport({
+  //   host: 'smtp.ethereal.email',
+  //   port: 587,
+  //   auth: {
+  //       user: 'nova.bogisich83@ethereal.email',
+  //       pass: 'ShSg1ygNrXKQfUHtgk'
+  //   }
+  // });
+
+
+  //Gmail....https://myaccount.google.com/ >>> Security >>> App PAssword >>>Generate new pswd
   const transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
+    service: 'gmail',
+    host: 'smtp.gmail.com',
+    //port: 465,
+    secure: true,
     auth: {
-        user: 'nova.bogisich83@ethereal.email',
-        pass: 'ShSg1ygNrXKQfUHtgk'
+        user: 'soumyakantid6@gmail.com',
+        pass: 'jtbikpffsinqineh'
     }
   });
 
   // send mail with defined transport object
   let info = await transporter.sendMail({
-    from: '"Fred Foo 👻" <foo@example.com>', // sender address
+    from: '"Soumya 👻" <soumyakantid6@gmail.com>', // sender address
     to: email, // list of receivers
     subject: "Verification Password", // Subject line
     text: "Your One Time Password is  "+otp, // plain text body
@@ -253,7 +266,8 @@ const forgotPassword = async (req,res) => {
 
   await otpModel.create({ email, otp });
 
-  return res.status(200).send(`Message sent: ${info.messageId}, Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
+  return res.status(200).send(`Message sent Successfully... 
+          From : ${info.envelope.from} To : ${info.envelope.to} `);
   }
   catch (error) {
     res.status(500).send({ Status: "Failed", Message: error.message });
